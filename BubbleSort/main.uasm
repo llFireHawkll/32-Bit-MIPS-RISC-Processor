@@ -1,0 +1,42 @@
+.include "beta.uasm"
+
+        BR(STEP1)   // start execution with Step 1
+
+        // the array to be sorted
+        A:      LONG(10) LONG(56) LONG(27) LONG(69) LONG(73) LONG(99)
+                LONG(44) LONG(36) LONG(10) LONG(72) LONG(71) LONG(1)
+
+ALEN = (. - A)/4    // determine number of elements in A
+
+// Please enter your code for each of the steps below...
+i = R0
+swapped = R1
+
+STEP1:
+        SUB(swapped,swapped,swapped)
+STEP2:
+        SUB(i,i,i)
+STEP3:
+        ADDC(i,1,i)
+		CMPLTC(i,ALEN,R5)
+		BEQ(R5,STEP5)
+STEP4:
+        MULC(R0,4,R2) // i in R0, convert index into byte offset
+		// load address is Reg[Ra] + sxt(16-bit) literal
+		LD(R2,A-4,R3)   // loads A[i-1]
+		LD(R2,A,R4) // loads A[i]
+		CMPLE(R3,R4,R6)
+		BNE(R6,STEP3)
+		ST(R3,A,R2)
+		ST(R4,A-4,R2)
+		CMOVE(1,swapped)
+		BNE(swapped, STEP3)
+		
+STEP5:
+        BNE(swapped, STEP1)
+
+
+// When step 5 is complete, execution continues with the
+// checkoff code.  You must include this code in order to
+// receive credit for completing the problem.
+.include "checkoff.uasm"

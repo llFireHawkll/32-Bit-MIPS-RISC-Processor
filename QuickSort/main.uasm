@@ -1,0 +1,205 @@
+////////////////////////////////////////////////////////////////////////////////
+// Lab 6
+////////////////////////////////////////////////////////////////////////////////
+
+// Include the checkoff program:
+.include "checkoff.uasm"
+
+// Leave the following as zero to run ALL the test cases, and get your solution
+//   validated if all pass.  If you have trouble with test case N, set it to N
+//   to run JUST that test case (for easier debugging):
+TestCase:       LONG(0)
+
+// Quicksort-in-place code.  We include the C/Python version here as a comment;
+// you can use this as a model for your Beta assembly version:
+
+//def partition(array,left,right):
+//    # choose middle element of array as pivot
+//    pivotIndex = (left+right) >> 1;
+//    pivotValue = array[pivotIndex]
+//
+//    # swap array[right] and array[pivotIndex]
+//    # note that we already store array[pivotIndex] in pivotValue
+//    array[pivotIndex] = array[right]
+//
+//    # elements <= the pivot are moved to the left (smaller indices)
+//    storeIndex = left
+//    for i in xrange(left,right):  # don't include array[right]
+//        temp = array[i]
+//        if temp <= pivotValue:
+//            array[i] = array[storeIndex]
+//            array[storeIndex] = temp
+//            storeIndex += 1
+//
+//    # move pivot to its final place
+//    array[right] = array[storeIndex]
+//    array[storeIndex] = pivotValue;
+//    return storeIndex;
+
+partition:
+        PUSH(LP)
+        PUSH(BP)
+        MOVE(SP, BP)
+
+// Fill in your code here...
+		PUSH(R1)
+		PUSH(R2) 
+      	PUSH(R3) 
+      	PUSH(R4)
+		PUSH(R5)
+		PUSH(R6)
+		PUSH(R7) 
+   		PUSH(R8)
+		PUSH(R9)
+		PUSH(R10)
+		PUSH(R11)
+		PUSH(R12)
+		PUSH(R13)
+		
+	
+		LD(BP, -12, R2) 
+      	LD(BP, -16, R3) 
+	  	LD(BP, -20, R4)
+		
+		ADD(R3, R4, R0)
+		SHRC(R0, 1, R0)	
+		MOVE(R0, R5)	//R5 -> pivotIndex = (left+right) >> 1;
+		
+		SHLC(R5, 2, R8)
+		ADD(R8, R2, R0)	
+		LD(R0,0,R6)	//R6 -> pivotValue = array[pivotIndex] <-R0
+		
+		SHLC(R4, 2, R9)
+		ADD(R9, R2, R9)
+		LD(R9,0,R7)	// array[pivotIndex] = array[right]
+		ST(R7,0,R0)
+		
+		MOVE(R3,R7)		// R7 -> storeIndex = left
+		
+		
+		MOVE(R3, R0)	// R0 -> i = left	
+		BR(test)
+loop:
+		
+		SHLC(R0, 2, R0)
+		ADD(R0, R2, R8)
+		LD(R8,0,R9)   // R9 = temp -> temp = array[i]
+		
+		SHRC(R0, 2, R0)
+		ADDC(R0, 1, R0)
+		CMPLE(R9, R6, R13) // temp <= pivotValue
+		BF(R13, test)
+
+
+		SHLC(R7, 2, R10)
+		ADD(R10, R2, R10)
+		LD(R10,0,R12)
+
+
+		ST(R12,0,R8)	// array[i] = array[storeIndex]
+		ST(R9,0,R10)	// array[storeIndex] = temp
+		ADDC(R7, 1, R7) //  storeIndex += 1
+		
+test:
+		CMPLT(R0, R4, R11)
+		BT(R11, loop)		
+		
+		SHLC(R4, 2, R11)
+		ADD(R11, R2, R13)	
+		SHLC(R7, 2, R11)
+		ADD(R11, R2, R11)
+		LD(R11, 0, R12)
+		ST(R12,0,R13)	// array[right] = array[storeIndex]	
+		
+		SHLC(R7, 2, R11)
+		ADD(R11, R2, R13)
+		ST(R6,0,R13)	// array[storeIndex] = pivotValue;
+		MOVE(R7, R0)	// return storeIndex;
+		
+		POP(R13)
+		POP(R12)
+		POP(R11)
+		POP(R10)
+		POP(R9)
+		POP(R8)
+		POP(R7)
+		POP(R6)
+		POP(R5)
+		POP(R4)
+      	POP(R3)
+      	POP(R2)
+		POP(R1)
+        MOVE(BP, SP)
+        POP(BP)
+        POP(LP)
+        JMP(LP)
+
+
+
+
+//def quicksort(array, left, right):
+//    if left < right:
+//        pivotIndex = partition(array,left,right)
+//        quicksort(array,left,pivotIndex-1)
+//        quicksort(array,pivotIndex+1,right)
+
+// quicksort(ArrayBase, left, right)
+quicksort:
+        PUSH(LP)
+        PUSH(BP)
+        MOVE(SP, BP)
+
+// Fill in your code here...
+		PUSH(R2) 
+      	PUSH(R3) 
+      	PUSH(R4) 
+      	PUSH(R5)
+		
+		
+		LD(BP, -12, R2) 
+      	LD(BP, -16, R3) 
+	  	LD(BP, -20, R4)
+		
+		CMPLT(R3, R4, R0) 
+      	BF(R0, qx)
+		
+		PUSH(R4)
+      	PUSH(R3)
+      	PUSH(R2) 
+      	BR(partition, LP) 
+      	DEALLOCATE(3)
+      	MOVE(R0, R5)
+
+      	SUBC(R5, 1, R0)
+      	PUSH(R0)
+      	PUSH(R3)
+      	PUSH(R2) 
+     	BR(quicksort, LP) 
+      	DEALLOCATE(3)
+
+      	PUSH(R4)
+      	ADDC(R5, 1, R0)
+      	PUSH(R0)
+      	PUSH(R2) 
+      	BR(quicksort, LP)
+	   	DEALLOCATE(3)
+
+qx:   	
+		POP(R5)
+      	POP(R4)
+      	POP(R3)
+      	POP(R2)
+
+        MOVE(BP, SP)
+        POP(BP)
+        POP(LP)
+        JMP(LP)
+
+// Allocate a stack: SP is initialized by checkoff code.
+StackBasePtr:
+        LONG(StackArea)
+
+.unprotect
+
+StackArea:
+        STORAGE(1000)
